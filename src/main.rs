@@ -61,6 +61,7 @@ impl EventHandler for Handler {
                                 ('\u{200B}'.to_string(), '\u{200B}'.to_string(), true),
                                 ("High".to_string(), format!("${: <7.2}", stock.high), true),
                             ]);
+                            e.description(format!("[twits](https://stocktwits.com/symbol/{}) | [yhoo](https://finance.yahoo.com/quote/{}/)", stock.symbol, stock.symbol));
 
                             e
                         });
