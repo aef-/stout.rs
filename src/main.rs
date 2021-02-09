@@ -56,9 +56,9 @@ impl EventHandler for Handler {
                         m.embed(|e| {
                             let content =
                                 vec![
-                                ("Price", format!("${}", stock.current_price), false),
-                                ("Low", format!("${}", stock.low), true),
-                                ("High", format!("${}", stock.high), true)
+                                ("Price", format!("${: <7.2}", stock.current_price), false),
+                                ("Low", format!("${: <7.2}", stock.low), true),
+                                ("High", format!("${: <7.2}", stock.high), true)
                                 ];
 
 
