@@ -2,8 +2,8 @@ use plotters::prelude::*;
 use super::stock::Stock;
 
 
-pub fn build_chart(stock: Stock) -> Result<(), Box<dyn std::error::Error>>  {
-    let root = BitMapBackend::new("0.png", (640, 480)).into_drawing_area();
+pub fn build_chart(stock: &Stock) -> Result<(), Box<dyn std::error::Error>>  {
+    let root = BitMapBackend::new("0.png", (200, 100)).into_drawing_area();
     root.fill(&WHITE)?;
     let mut chart = ChartBuilder::on(&root)
         .margin(5)

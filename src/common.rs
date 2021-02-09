@@ -1,5 +1,6 @@
 use std::str::FromStr;
 use std::time::Duration;
+use std::cmp;
 
 use chrono::{Local, TimeZone, Utc};
 use itertools::izip;
@@ -250,3 +251,16 @@ pub fn remove_zeros(prices: Vec<f64>) -> Vec<f64> {
 pub fn remove_zeros_lows(prices: Vec<Price>) -> Vec<Price> {
     prices.into_iter().filter(|x| x.low.ne(&0.0)).collect()
 }
+
+pub fn format_large_number(n: f64) -> String {
+    if n == 0.0 {
+        return "0".to_string();
+    }
+
+    let abbr = vec!["","K", "M","B","T"];
+    let digits = n.abs().log10();
+    let digits = (digits / 3.0).floor();
+    let abbr_index = cmp::max(0, cmp::min(digits as usize, abbr.len() - 1));
+    format!("{:.2}{}", n / 10_f64.powf(abbr_index as f64 * 3.0), abbr[abbr_index])
+}
+

@@ -161,6 +161,7 @@ pub struct CompanyPrice {
     pub post_market_price: CompanyPostMarketPrice,
     pub regular_market_volume: CompanyMarketPrice,
     pub currency: Option<String>,
+    pub market_cap: Option<CompanyMarketCap>
 }
 
 #[serde(rename_all = "camelCase")]
@@ -169,6 +170,14 @@ pub struct CompanyMarketPrice {
     #[serde(rename = "raw")]
     pub price: f64,
     pub fmt: String,
+}
+
+#[serde(rename_all = "camelCase")]
+#[derive(Debug, Deserialize, Clone)]
+pub struct CompanyMarketCap {
+    #[serde(rename = "raw")]
+    pub amount: Option<f64>,
+    pub fmt: Option<String>,
 }
 
 #[serde(rename_all = "camelCase")]

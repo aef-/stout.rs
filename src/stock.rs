@@ -1,4 +1,4 @@
-use crate::api::model::ChartMeta;
+use crate::api::model::{ChartMeta, CompanyProfile, CompanyMarketCap};
 use crate::common::{chart_data_to_prices, Price, TimeFrame};
 use std::io;
 use tokio::task;
@@ -12,11 +12,13 @@ pub struct Stock {
     pub current_price: f64,
     pub time_frame: TimeFrame,
     pub pct_change: f64,
+    pub company: Option<CompanyProfile>,
+    pub market_cap: Option<f64>,
 }
 
 impl Stock {
     pub async fn new(symbol: &str) -> Stock {
-        let (current_regular_price, current_post_price, volume) =
+        let (company_profile, market_cap, current_regular_price, current_post_price, _volume) =
             fetch_current_price(symbol.to_string())
                 .await
                 .unwrap()
@@ -35,15 +37,16 @@ impl Stock {
         let (high, low) = get_high_low(current_price, &prices);
         let pct_change = pct_change(current_price, time_frame, prev_close_price, &prices);
 
-
         Stock {
             symbol: symbol.to_string(),
+            company: company_profile,
+            market_cap: market_cap.map_or_else(|| None, |v| v.amount),
             prices,
             high,
             low,
             current_price,
             time_frame,
-            pct_change
+            pct_change,
         }
     }
 }
@@ -54,12 +57,14 @@ fn remove_zeros_lows(prices: Vec<Price>) -> Vec<Price> {
 
 fn fetch_current_price(
     symbol: String,
-) -> task::JoinHandle<Result<(f64, Option<f64>, String), io::Error>> {
+) -> task::JoinHandle<Result<(Option<CompanyProfile>, Option<CompanyMarketCap>, f64, Option<f64>, String), io::Error>> {
     task::spawn(async move {
         let response = crate::CLIENT.get_company_data(&symbol).await;
 
         match response {
             Ok(payload) => Ok((
+                payload.profile,
+                payload.price.market_cap,
                 payload.price.regular_market_price.price,
                 payload.price.post_market_price.price,
                 payload.price.regular_market_volume.fmt,
