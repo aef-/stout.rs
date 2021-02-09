@@ -51,10 +51,6 @@ impl TimeFrame {
         }
     }
 
-    pub const fn tab_names() -> [&'static str; 7] {
-        ["1D", "1W", "1M", "3M", "6M", "1Y", "5Y"]
-    }
-
     pub const ALL: [TimeFrame; 7] = [
         TimeFrame::Day1,
         TimeFrame::Week1,
