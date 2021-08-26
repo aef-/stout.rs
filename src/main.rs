@@ -29,11 +29,10 @@ use std::env;
 
 lazy_static! {
     static ref CLIENT: api::Client = api::Client::new();
-    static ref SYMBOL_RE: Regex = Regex::new(r"\$([A-Z]{1,5})(\W|$)").unwrap();
+    static ref SYMBOL_RE: Regex = Regex::new(r"\$([A-Z]{1,5})(\+)?(\W|$)").unwrap();
 }
 
 #[group]
-#[commands(ping)]
 struct General;
 
 struct Handler;
@@ -58,7 +57,7 @@ impl EventHandler for Handler {
                 //println!("{:?}", img);
 
                 let company_website = stock.company.to_owned().map_or_else(|| None, |v| v.website);
-                let company_website = company_website.map_or_else(|| "".to_string(), |w| format!("| [web]({})", w));
+                let company_website = company_website.map_or_else(|| "".to_string(), |w| format!(" | [web]({})", w));
                 let msg = msg
                     .channel_id
                     .send_message(&context.http, |m| {
@@ -111,17 +110,10 @@ async fn main() {
     }
 }
 
-#[command]
-async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    msg.reply(ctx, "Pong!").await?;
-
-    Ok(())
-}
-
 fn get_symbol_names(message: &str) -> Vec<&str> {
     return SYMBOL_RE
         .captures_iter(message)
-        .map(|x| return x.get(1).unwrap().as_str())
+        .map(|x| x.get(2).unwrap_or(None).as_str())
         .collect::<Vec<&str>>();
 }
 
@@ -135,5 +127,8 @@ mod tests {
 
         let message = "$TEST";
         assert_eq!(get_symbol_names(&message), ["TEST"]);
+
+        let message = "this is a test $TEST+";
+        assert_eq!(get_symbol_names(&message), ["TEST+"]);
     }
 }
